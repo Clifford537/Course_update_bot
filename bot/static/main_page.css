@@ -1,0 +1,133 @@
+/* styles.css */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-image: url('../static/main8.png');
+    background-size: cover;
+    background-repeat: repeat;
+    background-position: center;
+
+}
+
+.container {
+    max-width: 600px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    border-radius: 50px;
+    padding: 40px;
+    text-align: center;
+    background: linear-gradient(260deg, #b181df, #6808e6);;
+}
+
+h1{
+    color: #250729;
+}
+ 
+h2 {
+   
+    font-size: 24px;
+    margin-bottom: 20px;
+    color:#291202;
+    font-weight: bold;
+    
+}
+
+td{
+    color: rgb(253, 253, 253);
+    font-weight: bolder;
+    font-size: 18px;
+   
+}
+
+.message-box {
+    margin-top: 20px;
+    
+}
+
+label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 10px;
+    font-size: 18px;
+    color: #ffffff;
+    cursor:true;
+}
+
+textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #0fd3ec;
+    border-radius: 5px;
+    font-size: 16px;
+    border-color: #000;
+    border-width: 5%;
+    background-color: #f7f7f7;
+    
+
+}
+
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+button {
+    background: linear-gradient(135deg, #06abd4, #5b07aa);;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+button:hover {
+    background-color: #0056b3; /* Darker shade for hover */
+}
+
+.home-button {
+    text-decoration: none;
+    background-color: #333;
+    background: linear-gradient(135deg, #091fe9, #09df7b);
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 18px;
+    color: #ffffff;
+}
+
+.home-button:hover {
+    background-color: #000;
+}
+
+.logout-button {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    width: 50px; /* Adjust the width and height as needed */
+    height: 50px;
+    background-image: url('../static/logout5.png'); /* Replace with your image path */
+    background-size: cover;
+    cursor: pointer;
+    border-radius: 50px;
+}
+.changepass{
+   position: absolute;
+    top: 80px;
+    right: 80px;
+    width: 100px; /* Adjust the width and height as needed */
+    height: 100px;
+    cursor: pointer;
+ 
+}
+h3{
+    color: white;
+    background-color: #0056b3;
+    border-radius: 5px;
+
+}

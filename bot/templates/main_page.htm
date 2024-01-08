@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Bot Main Page</title>
+    <link rel="stylesheet" href="../static/main_page.css">
+</head>
+<body>
+    <a href="{{url_for('logout')}}" class="logout-button"></a><br>
+    <a href="{{url_for('change_password')}}" class="changepass" ><h3><b>Change password</b></h3></a>
+    <div class="container">
+        <h1>Welcome to Your CampusNotifier Bot</h1>
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul>
+                        {% for message in messages %}
+                            <li class="flash-message">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+        </div>
+        <div class="message-box">
+            <label for="message">Type a message:</label>
+            <textarea id="message" rows="4" cols="50"></textarea>
+        </div>
+
+        <div>
+            <h1>Your Regstered groups are:</h1>
+            <input type="checkbox">Information_Systems
+        </div>
+        <div class="button-container">
+            <button id="send-button" onclick="sendMessage()">Send</button>
+            <a href="{{url_for('index')}}" class="home-button">Home</a>
+        </div>
+
+
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function sendMessage() {
+            var message = $('#message').val();
+            $.ajax({
+                type: 'POST',
+                url: '/send_message',
+                data: { message: message },
+                success: function (response) {
+                    if (response.success) {
+                        alert('Message sent successfully!');
+                    } else {
+                        alert('An error occurred. Please try again.');
+                    }
+                },
+                error: function () {
+                    alert('An error occurred. Please try again.');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

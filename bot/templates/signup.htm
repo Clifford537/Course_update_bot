@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" type="text/css" href="../static/signup.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2>Fill in the information below</h2>
+        <!-- Display flash messages -->
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul>
+                        {% for message in messages %}
+                            <li class="flash-message">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        <form action="{{ url_for('signup') }}" method="post" onsubmit="return validatePassword()">
+            <input type="text" name="lecturer_name" placeholder="Lecturer Name" required>
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" id="password" name="password" placeholder="Password (at least 6 characters)" minlength="6" required>
+            <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" required>
+
+  <label><b>Select Group:</b></label>
+<div class="group-container">
+   {% for group_name in groups %}
+      <div>
+         <input type="checkbox" id="{{ group_name }}" name="selected_groups" value="{{ group_name }}" class="group-checkbox">
+         <label for="{{ group_name }}" class="group-label">{{ group_name }}</label>
+      </div>
+   {% endfor %}
+</div>
+
+
+          <table class="td" id="dataTable">
+                <tr>
+                    <td>Class</td>
+                    <td>CODE</td>
+                </tr>
+                <tr>
+                    <td><input type="text" maxlength="3" name="class" required /></td>
+                    <td><input type="number" max="999" name="code" required /></td>
+                    <td><button class="remove-row-button" type="button">-</button></td>
+                </tr>
+            </table>
+            <button class="add-row-button" type="button">+</button><br>
+            <button class="button" type="submit">Submit</button>
+            <a class="button1" href="{{ url_for('index') }}">Go Back</a>
+        </form>
+    </div>
+
+    <script>
+        function validatePassword() {
+            var password = document.getElementById("password").value;
+            var confirmPassword = document.getElementById("confirm_password").value;
+
+            if (password !== confirmPassword) {
+                alert("Password and Confirm Password do not match. Please try again.");
+                return false;
+            }
+            return true;
+        }
+
+        // Add a new row when the + button is clicked
+        $(document).on("click", ".add-row-button", function() {
+            var newRow = '<tr><td><input type="text" maxlength="3" name="class" required /></td><td><input type="number" max="999" name="code" required /></td><td><button class="remove-row-button" type="button">-</button></td></tr>';
+            $('#dataTable').append(newRow);
+        });
+
+        // Remove a row when the - button is clicked
+        $(document).on("click", ".remove-row-button", function() {
+            $(this).closest('tr').remove();
+        });
+    </script>
+</body>
+</html>
