@@ -259,21 +259,26 @@ def forget_password():
             try:
                 # Create a cursor and execute the SQL query
                 with mysql.cursor() as cur:
-                    cur.execute("UPDATE lecturers SET password = %s WHERE email = %s", (hashed_password, email))
-                    # Commit the changes to the database
-                    mysql.commit()
-                    flash('Password changed successfully!', 'success')
-                    return redirect(url_for('index'))
-            except Exception as e:
+                    # Check if the email exists in the database
+                    cur.execute("SELECT * FROM lecturers WHERE lecturer_email = %s", (email,))
+                    lecturer = cur.fetchone()
+                    if lecturer:
+                        # Update the password for the corresponding email
+                        cur.execute("UPDATE lecturers SET lecturer_password = %s WHERE lecturer_email = %s", (hashed_password, email))
+                        # Commit the changes to the database
+                        mysql.commit()
+                        flash('Password changed successfully!', 'success')
+                        return redirect(url_for('index'))
+                    else:
+                        flash('Email address not found. Please enter a valid email address.', 'error')
+            except pymysql.Error as e:
                 # Log or print the error, and display a flash message
                 print(f"Error updating password: {e}")
                 flash('An error occurred. Please try again.', 'error')
-
         else:
             flash('New password and confirm password do not match. Please try again.', 'error')
 
     return render_template('forget_password.html')
-
 
 @app.route('/logout')
 def logout():

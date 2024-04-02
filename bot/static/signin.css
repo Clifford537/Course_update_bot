@@ -69,7 +69,7 @@ img{
     border-radius: 50px;
 }
 .button_pass {
-    background-color: rgb(57, 74, 224);
+    background-color: rgb(66, 157, 243);
     color: #ffffff;
     border: none;
     padding:10px;
@@ -83,4 +83,4 @@ img{
 }
 
 .button_pass:hover {
-    background-color:blue;}
+    background-color:rgb(82, 82, 223);}

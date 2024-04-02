@@ -13,7 +13,8 @@
                 <input type="email" name="email" placeholder="Email" autocomplete="no" required>
                 <input type="password" name="password" placeholder="Password" autocomplete="no" required><br>
                 <button class="button" type="submit">Submit</button>
-                <a class="button" href="{{url_for('index')}}">BACK</a>
+                <a class="button" href="{{url_for('index')}}">BACK</a> <br>
+                <a class="button_pass"  href="{{url_for('forget_password')}}">Reset Password</a>
             </form>
 
             <p class="notification" id="notification">{{ message }}</p>
