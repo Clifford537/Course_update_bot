@@ -12,10 +12,10 @@ app = Flask(__name__)
 
 # MySQL configuration
 app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_PORT'] = 3303
+app.config['MYSQL_PORT'] = 3302
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'cliff'
-app.config['MYSQL_DB'] = 'telegrambot_v1'
+app.config['MYSQL_DB'] = 'telegrambot_v4'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 # Initialize PyMySQL
@@ -71,18 +71,17 @@ def signin():
 
         try:
             # Get the cursor from the connection
-            cur = mysql.cursor()
-            cur.execute("SELECT * FROM lecturers WHERE email = %s", (email,))
-            lecturer = cur.fetchone()
-            cur.close()
+            with mysql.cursor() as cur:
+                cur.execute("SELECT * FROM lecturers WHERE lecturer_email = %s", (email,))
+                lecturer = cur.fetchone()
 
-            if lecturer and hashlib.sha256(password.encode('utf-8')).hexdigest() == lecturer['password']:
-                session['email'] = email
-                flash('Login successful!', 'success')
-                return redirect(url_for('main_page'))
-            else:
-                message = 'Incorrect email or password. Please try again.'
-                return render_template('signin.html', message=message)
+                if lecturer and hashlib.sha256(password.encode('utf-8')).hexdigest() == lecturer['lecturer_password']:
+                    session['email'] = email
+                    flash('Login successful!', 'success')
+                    return redirect(url_for('main_page'))
+                else:
+                    flash('Incorrect email or password. Please try again.', 'error')
+                    return render_template('signin.html')
 
         except Exception as e:
             print(f"Error in signin: {e}")
@@ -97,14 +96,14 @@ def signup():
     if request.method == 'POST':
         try:
             lecturer_name = request.form['lecturer_name']
-            email = request.form['email']
+            email = request.form['lecturer_email']
             password = request.form['password']
 
             # Hash the password before storing it in the database
             hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
 
-            class_name = request.form['class']
-            code = request.form['code']
+            class_name = request.form['class']  # Corrected to 'lecturer_class'
+            code = request.form['code']          # Corrected to 'lecturer_code'
 
             # Get the selected groups from the checkboxes
             selected_groups = request.form.getlist('selected_groups')
@@ -113,7 +112,7 @@ def signup():
             group_names = ','.join(selected_groups)
 
             with mysql.cursor() as cur:
-                cur.execute("INSERT INTO lecturers (lecturer_name, email, password, class, code, group_name) VALUES (%s, %s, %s, %s, %s, %s)",
+                cur.execute("INSERT INTO lecturers (lecturer_name, lecturer_email, lecturer_password, lecturer_class, lecturer_code, group_name) VALUES (%s, %s, %s, %s, %s, %s)",
                             (lecturer_name, email, hashed_password, class_name, code, group_names))
                 mysql.commit()
 
@@ -124,9 +123,11 @@ def signup():
             flash('Email already exists. Please use a different email address.', 'error')
 
     # Fetch the groups from the database
+   # Fetch the groups from the database
     with mysql.cursor() as cur:
         cur.execute("SELECT group_name FROM telegram_groups")
         groups = cur.fetchall()
+
 
     # Check if groups is empty and handle it accordingly
     if not groups:
@@ -139,6 +140,7 @@ def signup():
 
     # Pass the groups dictionary to the template
     return render_template('signup.htm', groups=groups_dict)
+
 
 
 @app.route('/main_page', methods=['GET'])
