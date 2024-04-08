@@ -91,6 +91,7 @@ def signin():
     return render_template('signin.html')
 
 
+
 @app.route('/signup', methods=['GET', 'POST'], endpoint='signup')
 def signup():
     if request.method == 'POST':
@@ -102,8 +103,8 @@ def signup():
             # Hash the password before storing it in the database
             hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
 
-            class_name = request.form['class']  # Corrected to 'lecturer_class'
-            code = request.form['code']          # Corrected to 'lecturer_code'
+            class_name = request.form['class']
+            code = request.form['code']
 
             # Get the selected groups from the checkboxes
             selected_groups = request.form.getlist('selected_groups')
@@ -119,29 +120,19 @@ def signup():
             session['email'] = email  # Optional: Automatically log in the user after signup
             flash('Registration successful! Your information has been submitted.', 'success')
             return redirect(url_for('signup'))  # Redirect back to the signup page to display the flash message
-        except IntegrityError as e:
+        except IntegrityError:
             flash('Email already exists. Please use a different email address.', 'error')
 
     # Fetch the groups from the database
-   # Fetch the groups from the database
     with mysql.cursor() as cur:
-        cur.execute("SELECT group_name FROM telegram_groups")
-        groups = cur.fetchall()
+        cur.execute("SELECT name FROM telegram_groups")
+        groups_data = cur.fetchall()
 
+    # Extract group names from the list of dictionaries
+    groups = [group['name'] for group in groups_data]
 
-    # Check if groups is empty and handle it accordingly
-    if not groups:
-        groups = []
-
-    # Convert the groups list to a dictionary
-    groups_dict = {}
-    for group in groups:
-        groups_dict[group['group_name']] = group['group_name']
-
-    # Pass the groups dictionary to the template
-    return render_template('signup.htm', groups=groups_dict)
-
-
+    # Pass the group names to the template
+    return render_template('signup.htm', groups=groups)
 
 @app.route('/main_page', methods=['GET'])
 def main_page():
@@ -149,6 +140,31 @@ def main_page():
         return render_template('main_page.htm', send_message_url=url_for('send_message'))
     else:
         return redirect(url_for('signin'))
+    
+    
+@app.route('/get_registered_groups', methods=['GET'])
+def get_registered_groups():
+    try:
+        lecturer_email = session.get('email')  # Assuming you store the lecturer's email in the session
+        if not lecturer_email:
+            return jsonify({'success': False, 'error': 'User not logged in.'}), 401
+
+        # Fetch registered groups for the lecturer from the database
+        with mysql.cursor() as cur:
+            cur.execute("SELECT group_name FROM lecturers WHERE lecturer_email = %s", (lecturer_email,))
+            result = cur.fetchone()
+            if result:
+                registered_groups = result['group_name'].split(',')
+                print("Registered Groups:", registered_groups)  # Print the group names
+            else:
+                registered_groups = []
+
+        return jsonify({'success': True, 'registeredGroups': registered_groups})
+    
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+
 
 
 @app.route('/send_message', methods=['POST'])
