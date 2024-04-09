@@ -165,13 +165,14 @@ def get_registered_groups():
         return jsonify({'success': False, 'error': str(e)})
 
 
-
-
 @app.route('/send_message', methods=['POST'])
 async def send_message():
     message_text = request.form.get('message')
     sender_email = session.get('email')
     sender_name = session.get('lecturer_name')
+
+    # Retrieve the attached file from the request
+    file = request.files.get('file')
 
     try:
         # Save the message to the database
@@ -188,43 +189,49 @@ async def send_message():
     except Exception as save_error:
         # Log error
         logging.error(f"Error saving message to the database: {save_error}")
-
-        print(f"Error saving message to the database: {save_error}")
         flash('An error occurred while saving the message. Please try again.', 'error')
 
         # Return an error response for database saving failure
         return jsonify({'success': False})
-
 
     try:
         # Attempt to send the message to the Telegram bot and channels
         bot = Bot(token='6801294138:AAHuZ6EY7lgOKvVCiFK6fT_mJBW6LOXioHs')
 
         sender_name = session.get('lecturer_name', 'Unknown User')
-        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        full_message = f"{sender_email} sent a message at\n {timestamp}:\n\n{message_text}"
+        # Format the timestamp to show only hours and minutes
+        timestamp = datetime.now().strftime('%H:%M')
+        full_message = f"{sender_email} sent a message at {timestamp}:\n\n{message_text}"
+        
+        # Send message to the channels and bot
         await bot.send_message(chat_id="5706754147", text=full_message)
         await bot.send_message(chat_id="@botv1class", text=full_message)
 
+        if file:
+            # Determine the file type and send accordingly
+            if file.content_type.startswith('image'):
+                await bot.send_photo(chat_id="5706754147", photo=file, caption=full_message)
+                await bot.send_photo(chat_id="@botv1class", photo=file, caption=full_message)
+            elif file.content_type.startswith('audio'):
+                await bot.send_audio(chat_id="5706754147", audio=file, caption=full_message)
+                await bot.send_audio(chat_id="@botv1class", audio=file, caption=full_message)
+            elif file.content_type.startswith('video'):
+                await bot.send_video(chat_id="5706754147", video=file, caption=full_message)
+                await bot.send_video(chat_id="@botv1class", video=file, caption=full_message)
+            else:
+                await bot.send_document(chat_id="5706754147", document=file, caption=full_message)
+                await bot.send_document(chat_id="@botv1class", document=file, caption=full_message)
 
         # Log success
         logging.info('Message sent successfully.')
-
         flash('Message sent successfully!', 'success')
-
-        # Return a success response for message sending success
         return jsonify({'success': True})
 
     except Exception as send_error:
         # Log error
         logging.error(f"Error sending message: {send_error}")
-
-        print(f"Success! Message saved but an error occurred while sending. Please try again.")
         flash('Message sent successfully, but there was an issue with sending. Please try again.', 'success')
-
-        # Return a success response despite message sending failure
         return jsonify({'success': True})
-
 
 @app.route('/change_password', methods=['GET', 'POST'], endpoint='change_password')
 def change_password():
