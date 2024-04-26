@@ -151,7 +151,7 @@ def get_registered_groups():
 
         # Fetch registered groups for the lecturer from the database
         with mysql.cursor() as cur:
-            cur.execute("SELECT group_name FROM lecturers WHERE lecturer_email = %s", (lecturer_email,))
+            cur.execute("SELECT group_name  FROM lecturers WHERE lecturer_email = %s", (lecturer_email,))
             result = cur.fetchone()
             if result:
                 registered_groups = result['group_name'].split(',')
@@ -163,6 +163,7 @@ def get_registered_groups():
     
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
+
 
 
 @app.route('/send_message', methods=['POST'])
@@ -206,6 +207,7 @@ async def send_message():
         # Send message to the channels and bot
         await bot.send_message(chat_id="5706754147", text=full_message)
         await bot.send_message(chat_id="@botv1class", text=full_message)
+        await bot.send_message(chat_id="@msnictm", text=full_message)
 
         if file:
             # Determine the file type and send accordingly
